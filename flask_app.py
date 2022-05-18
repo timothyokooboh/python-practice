@@ -1,21 +1,31 @@
+from email.policy import default
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 # create connection to a database
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres@localhost:5432/family"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres@localhost:5432/todoapp"
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-class Person(db.Model):
-    __tablename__ = "persons"
+class Todo(db.Model):
+    __tablename__ = 'todos'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(), nullable=False)
+    description = db.Column(db.String(), nullable=False)
+    completed = db.Column(db.Boolean, nullable=False, default=False)
 
-db.create_all()
+    def __repr(self):
+        return f'<Todo id={self.id} description={self.description}>'
+
+
+# db.create_all()
 
 @app.route("/")
 def index():
-    return "hello world! again makes sense too much. i prefer this one"
+    person = Person.query.first()
+    return "hello world! my name is {}".format(person.name)
 
 
 if __name__ == "__main__":
